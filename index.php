@@ -1,56 +1,94 @@
 <html>
 <head>
+	<style>
+header {
+ background-color: #555;
+ padding: 30px;
+ text-align: center;
+ font-size: 35px;
+ color: white;
+}
+
+footer {
+ background-color: #555;
+ padding: 10px;
+ text-align: center;
+ color: white;
+}
+body{
+	background-color:#777;
+}
+</style>
 </head>
-<body style = "text-align:center; font-size: 50px;">	
+<body>
+<header>
+ <h2>Friend book</h2>
+</header>
+</br>
+<form action="index.php" method="post"> 
+Name: <input type="text" name="name">
+<input type="submit" value = "Add new friend">
+<h2>My best friends :</h2>
+</form>
 <?php
-
-class Calculator{
-public function sum($x, $y) {
-	return $x + $y;
-}
-public function sub($x, $y) {
-	return $x - $y;
-}
-public function mul($x, $y) {
-	return $x * $y;
-}
-
-public function div($x, $y) {
-	if($y==0)
-	return "error";
-	return $x / $y;
-}
-}
-if(!isset($_GET["op"]) || !isset($_GET["x"]) || !isset($_GET["y"])){
-	echo "Incorrect or incomplete data";
-	exit();
+	$filename = 'friends.txt';
+	$nameFilter = NULL;
+	$name="";
+	$file = fopen("friends.txt","r");
+	$array  = array();
+	while(!feof($file))	
+	{
+		array_push($array,fgets($file));
 	}
-$calculator = new Calculator();
-$op = $_GET["op"];
-$x = $_GET["x"];
-$y = $_GET["y"];
-
-switch($op){
-	case "sum":
-	$result=$calculator->sum($x, $y);
-	echo "<h1>$x + $y = $result</h1>";
-	break;
-	case "subtract":
-	$result=$calculator->sub($x, $y);
-	echo "<h1>$x - $y = $result</h1>";
-	break;
-	case "multiply": 
-	$result=$calculator->mul($x, $y);
-	echo "<h1>$x * $y = $result</h1>";
-	break;
-	case "divide":
-	$result=$calculator->div($x,$y);
-	echo"<h1>$x \ $y = $result</h1>";
-	break;
-	default:
-	$op=$_GET["op"];
-	echo "<h1>Unrecognized operation $op</h1>";
-}
+	fclose($file);
+	if(empty($_POST['name']) && empty($_POST['namefilter']))
+	{
+			foreach ($array as $current)
+			{
+				echo "<li>".$current."</li>";
+			}
+	}
+	if(isset($_POST['name']))
+	{
+		$name = $_POST['name'];
+		if($name!=="")
+		{
+			$file = fopen("$filename", "a+");
+			array_push($array,$name);
+			fwrite($file, PHP_EOL."$name" );
+			fclose($file);
+			foreach ($array as $current)
+			{
+				echo "<li>".$current."</li>";
+			}
+		}
+	}
+	if (isset($_POST['nameFilter'])) 
+	{
+		$nameFilter = $_POST['nameFilter'];
+		if($nameFilter==="")
+		{
+			foreach ($array as $current)
+			{
+				echo "<li>".$current."</li>";
+			}
+		}else
+		{
+			foreach ($array as $current) 
+			{
+				if(strlen(strstr($current, $nameFilter)) > 0)
+				{
+					echo "<li>".$current."</li>";
+				}		
+			}
+		}
+	}
 ?>
+<form action="index.php" method="post">
+<input type="text" name="nameFilter" value="<?=$nameFilter?>">
+<input type="submit" value='Filter list'>
+</form>
+<footer>
+</footer>
 </body>
 </html>
